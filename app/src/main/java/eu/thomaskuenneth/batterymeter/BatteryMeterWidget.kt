@@ -15,6 +15,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.currentState
@@ -41,9 +42,15 @@ import java.util.Date
 class BatteryMeterWidget : GlanceAppWidget() {
 
     override val stateDefinition = PreferencesGlanceStateDefinition
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        provideContent {
+            // create your AppWidget here
+            Content(context, id)
+        }
+    }
 
     @Composable
-    override fun Content() {
+    fun Content(context: Context, id: GlanceId) {
         val percent = currentState(key = batteryPercent) ?: 100.0F
         val updated = currentState(key = lastUpdatedMillis) ?: System.currentTimeMillis()
         Column(
@@ -153,7 +160,7 @@ private suspend fun GlanceId.updateAppWidgetState(
         preferences[BatteryMeterWidgetReceiver.batteryPercent] = batteryPercent
         BatteryMeterWidget().update(
             context = context,
-            glanceId = this
+            id = this
         )
     }
 }
